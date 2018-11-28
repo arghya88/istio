@@ -4,7 +4,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: istio-statsd-prom-bridge
-  namespace: default
+  namespace: productpage
   labels:
     app: istio-statsd-prom-bridge
     chart: mixer-1.0.4
@@ -21,7 +21,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: istio
-  namespace: default
+  namespace: productpage
   labels:
     app: istio
     chart: istio-1.0.4
@@ -97,7 +97,7 @@ data:
       concurrency: 0
       #
       # Zipkin trace collector
-      zipkinAddress: zipkin.default:9411
+      zipkinAddress: zipkin.istio-system:9411
       #
       # Mutual TLS authentication between sidecars and istio control plane.
       controlPlaneAuthPolicy: NONE
@@ -112,7 +112,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: istio-mixer-service-account
-  namespace: default
+  namespace: productpage
   labels:
     app: mixer
     chart: mixer-1.0.4
@@ -124,13 +124,13 @@ metadata:
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
 metadata:
-  name: istio-mixer-admin-role-binding-default
+  name: istio-mixer-admin-role-binding-productpage
   labels:
     app: mixer
     chart: mixer-1.0.4
     heritage: Tiller
     release: istio
-    namespace: default
+    namespace: productpage
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -138,7 +138,7 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: istio-mixer-service-account
-    namespace: default
+    namespace: productpage
 
 ---
 # Source: istio/charts/mixer/templates/service.yaml
@@ -147,7 +147,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: istio-policy
-  namespace: default
+  namespace: productpage
   labels:
     chart: mixer-1.0.4
     release: istio
@@ -168,7 +168,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: istio-telemetry
-  namespace: default
+  namespace: productpage
   labels:
     chart: mixer-1.0.4
     release: istio
@@ -194,7 +194,7 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: istio-policy
-  namespace: default
+  namespace: productpage
   labels:
     chart: mixer-1.0.4
     release: istio
@@ -263,7 +263,7 @@ spec:
           - --address
           - unix:///sock/mixer.socket
           - --configStoreURL=k8s://
-          - --configDefaultNamespace=default
+          - --configDefaultNamespace=productpage
           - --trace_zipkin_url=http://zipkin:9411/api/v1/spans
         env:
         - name: GODEBUG
@@ -333,7 +333,7 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: istio-telemetry
-  namespace: default
+  namespace: productpage
   labels:
     chart: mixer-1.0.4
     release: istio
@@ -369,7 +369,7 @@ spec:
           - --address
           - unix:///sock/mixer.socket
           - --configStoreURL=k8s://
-          - --configDefaultNamespace=default
+          - --configDefaultNamespace=productpage
           - --trace_zipkin_url=http://zipkin:9411/api/v1/spans
         env:
         - name: GODEBUG
@@ -442,7 +442,7 @@ apiVersion: autoscaling/v2beta1
 kind: HorizontalPodAutoscaler
 metadata:
     name: istio-policy
-    namespace: default
+    namespace: productpage
 spec:
     maxReplicas: 5
     minReplicas: 1
@@ -460,7 +460,7 @@ apiVersion: autoscaling/v2beta1
 kind: HorizontalPodAutoscaler
 metadata:
     name: istio-telemetry
-    namespace: default
+    namespace: productpage
 spec:
     maxReplicas: 5
     minReplicas: 1
@@ -517,7 +517,7 @@ apiVersion: "config.istio.io/v1alpha2"
 kind: attributemanifest
 metadata:
   name: istioproxy
-  namespace: default
+  namespace: productpage
 spec:
   attributes:
     origin.ip:
@@ -631,7 +631,7 @@ apiVersion: "config.istio.io/v1alpha2"
 kind: attributemanifest
 metadata:
   name: kubernetes
-  namespace: default
+  namespace: productpage
 spec:
   attributes:
     source.ip:
@@ -695,7 +695,7 @@ apiVersion: "config.istio.io/v1alpha2"
 kind: stdio
 metadata:
   name: handler
-  namespace: default
+  namespace: productpage
 spec:
   outputAsJson: true
 ---
@@ -703,7 +703,7 @@ apiVersion: "config.istio.io/v1alpha2"
 kind: logentry
 metadata:
   name: accesslog
-  namespace: default
+  namespace: productpage
 spec:
   severity: '"Info"'
   timestamp: request.time
@@ -750,7 +750,7 @@ apiVersion: "config.istio.io/v1alpha2"
 kind: logentry
 metadata:
   name: tcpaccesslog
-  namespace: default
+  namespace: productpage
 spec:
   severity: '"Info"'
   timestamp: context.time | timestamp("2017-01-01T00:00:00Z")
@@ -786,7 +786,7 @@ apiVersion: "config.istio.io/v1alpha2"
 kind: rule
 metadata:
   name: stdio
-  namespace: default
+  namespace: productpage
 spec:
   match: context.protocol == "http" || context.protocol == "grpc"
   actions:
@@ -798,7 +798,7 @@ apiVersion: "config.istio.io/v1alpha2"
 kind: rule
 metadata:
   name: stdiotcp
-  namespace: default
+  namespace: productpage
 spec:
   match: context.protocol == "tcp"
   actions:
@@ -810,7 +810,7 @@ apiVersion: "config.istio.io/v1alpha2"
 kind: metric
 metadata:
   name: requestcount
-  namespace: default
+  namespace: productpage
 spec:
   value: "1"
   dimensions:
@@ -837,7 +837,7 @@ apiVersion: "config.istio.io/v1alpha2"
 kind: metric
 metadata:
   name: requestduration
-  namespace: default
+  namespace: productpage
 spec:
   value: response.duration | "0ms"
   dimensions:
@@ -864,7 +864,7 @@ apiVersion: "config.istio.io/v1alpha2"
 kind: metric
 metadata:
   name: requestsize
-  namespace: default
+  namespace: productpage
 spec:
   value: request.size | 0
   dimensions:
@@ -891,7 +891,7 @@ apiVersion: "config.istio.io/v1alpha2"
 kind: metric
 metadata:
   name: responsesize
-  namespace: default
+  namespace: productpage
 spec:
   value: response.size | 0
   dimensions:
@@ -918,7 +918,7 @@ apiVersion: "config.istio.io/v1alpha2"
 kind: metric
 metadata:
   name: tcpbytesent
-  namespace: default
+  namespace: productpage
 spec:
   value: connection.sent.bytes | 0
   dimensions:
@@ -943,7 +943,7 @@ apiVersion: "config.istio.io/v1alpha2"
 kind: metric
 metadata:
   name: tcpbytereceived
-  namespace: default
+  namespace: productpage
 spec:
   value: connection.received.bytes | 0
   dimensions:
@@ -968,11 +968,11 @@ apiVersion: "config.istio.io/v1alpha2"
 kind: prometheus
 metadata:
   name: handler
-  namespace: default
+  namespace: productpage
 spec:
   metrics:
   - name: requests_total
-    instance_name: requestcount.metric.default
+    instance_name: requestcount.metric.productpage
     kind: COUNTER
     label_names:
     - reporter
@@ -993,7 +993,7 @@ spec:
     - response_code
     - connection_security_policy
   - name: request_duration_seconds
-    instance_name: requestduration.metric.default
+    instance_name: requestduration.metric.productpage
     kind: DISTRIBUTION
     label_names:
     - reporter
@@ -1017,7 +1017,7 @@ spec:
       explicit_buckets:
         bounds: [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10]
   - name: request_bytes
-    instance_name: requestsize.metric.default
+    instance_name: requestsize.metric.productpage
     kind: DISTRIBUTION
     label_names:
     - reporter
@@ -1043,7 +1043,7 @@ spec:
         scale: 1
         growthFactor: 10
   - name: response_bytes
-    instance_name: responsesize.metric.default
+    instance_name: responsesize.metric.productpage
     kind: DISTRIBUTION
     label_names:
     - reporter
@@ -1069,7 +1069,7 @@ spec:
         scale: 1
         growthFactor: 10
   - name: tcp_sent_bytes_total
-    instance_name: tcpbytesent.metric.default
+    instance_name: tcpbytesent.metric.productpage
     kind: COUNTER
     label_names:
     - reporter
@@ -1088,7 +1088,7 @@ spec:
     - destination_service_namespace
     - connection_security_policy
   - name: tcp_received_bytes_total
-    instance_name: tcpbytereceived.metric.default
+    instance_name: tcpbytereceived.metric.productpage
     kind: COUNTER
     label_names:
     - reporter
@@ -1111,7 +1111,7 @@ apiVersion: "config.istio.io/v1alpha2"
 kind: rule
 metadata:
   name: promhttp
-  namespace: default
+  namespace: productpage
 spec:
   match: context.protocol == "http" || context.protocol == "grpc"
   actions:
@@ -1126,7 +1126,7 @@ apiVersion: "config.istio.io/v1alpha2"
 kind: rule
 metadata:
   name: promtcp
-  namespace: default
+  namespace: productpage
 spec:
   match: context.protocol == "tcp"
   actions:
@@ -1140,7 +1140,7 @@ apiVersion: "config.istio.io/v1alpha2"
 kind: kubernetesenv
 metadata:
   name: handler
-  namespace: default
+  namespace: productpage
 spec:
   # when running from mixer root, use the following config after adding a
   # symbolic link to a kubernetes config file via:
@@ -1154,7 +1154,7 @@ apiVersion: "config.istio.io/v1alpha2"
 kind: rule
 metadata:
   name: kubeattrgenrulerule
-  namespace: default
+  namespace: productpage
 spec:
   actions:
   - handler: handler.kubernetesenv
@@ -1165,7 +1165,7 @@ apiVersion: "config.istio.io/v1alpha2"
 kind: rule
 metadata:
   name: tcpkubeattrgenrulerule
-  namespace: default
+  namespace: productpage
 spec:
   match: context.protocol == "tcp"
   actions:
@@ -1177,7 +1177,7 @@ apiVersion: "config.istio.io/v1alpha2"
 kind: kubernetes
 metadata:
   name: attributes
-  namespace: default
+  namespace: productpage
 spec:
   # Pass the required attribute data to the adapter
   source_uid: source.uid | ""
@@ -1191,7 +1191,7 @@ spec:
     source.uid: $out.source_pod_uid | "unknown"
     source.labels: $out.source_labels | emptyStringMap()
     source.name: $out.source_pod_name | "unknown"
-    source.namespace: $out.source_namespace | "default"
+    source.namespace: $out.source_namespace | "productpage"
     source.owner: $out.source_owner | "unknown"
     source.serviceAccount: $out.source_service_account_name | "unknown"
     source.workload.uid: $out.source_workload_uid | "unknown"
@@ -1202,7 +1202,7 @@ spec:
     destination.labels: $out.destination_labels | emptyStringMap()
     destination.name: $out.destination_pod_name | "unknown"
     destination.container.name: $out.destination_container_name | "unknown"
-    destination.namespace: $out.destination_namespace | "default"
+    destination.namespace: $out.destination_namespace | "productpage"
     destination.owner: $out.destination_owner | "unknown"
     destination.serviceAccount: $out.destination_service_account_name | "unknown"
     destination.workload.uid: $out.destination_workload_uid | "unknown"
@@ -1217,7 +1217,7 @@ apiVersion: networking.istio.io/v1alpha3
 kind: DestinationRule
 metadata:
   name: istio-policy
-  namespace: default
+  namespace: productpage
 spec:
   host: istio-policy.productpage.svc.cluster.local
   trafficPolicy:
@@ -1230,7 +1230,7 @@ apiVersion: networking.istio.io/v1alpha3
 kind: DestinationRule
 metadata:
   name: istio-telemetry
-  namespace: default
+  namespace: productpage
 spec:
   host: istio-telemetry.productpage.svc.cluster.local
   trafficPolicy:
